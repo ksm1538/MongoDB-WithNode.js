@@ -1,0 +1,12 @@
+let var1 = "welcome nodejs!!";
+console.log("var1 : " + var1);
+
+function sum(a, b){
+    return a+b;
+}
+
+let intVar = sum(1,5);
+let stringVar = sum("key","board");
+
+console.log("intVar : " + intVar);
+console.log("stringVar : " + stringVar);
