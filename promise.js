@@ -1,5 +1,4 @@
 const addSum = function(a, b){
-
     // resolve : 응답이 성공했을 떄
     // reject : 응답이 실패했을 때
     // resolve or reject 가 호출되면 해당 함수의 나머지 로직은 타지 않는다. (callback의 경우는 return 해주지 않으면 나머지 로직을 탐)
@@ -15,10 +14,12 @@ const addSum = function(a, b){
 }
 
 // 일반적인 promise 함수
+/*
 addSum(10,20)
     .then(result => console.log({result}))
     .catch(error => console.log({error}));
-
+*/
+    /*
 // Promise 내에서 재호출 방법
 addSum(10,20)
     .then(result => {
@@ -27,7 +28,7 @@ addSum(10,20)
     })
     .then(result2 => console.log({result2}))
     .catch(error => console.log({error}));
-
+*/
 
 // await를 이용한 재호출
 const totalSum = async() => {
