@@ -2,16 +2,17 @@
   "name": "mongodb",
   "version": "1.0.0",
   "description": "mongodb with node.js",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev" : "nodemon index.js" 
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "mongoose": "^6.5.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.19"
