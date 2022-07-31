@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // schema 즉, 데이터의 정합성 체크 부분
 const UserSchema = new mongoose.Schema({
-    username:{type: String, required: true},
+    username:{type: String, required: true, unique: true},
     name: {type: String, required: true},
     age: String,
     email: String,
