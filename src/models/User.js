@@ -11,5 +11,5 @@ const UserSchema = new mongoose.Schema({
 }, {timestamps: true});
 // timestamps : 데이터가 생성된 시각을 넣는 기능
 
-const User = mongoose.model('user', UserSchema);
+const User = mongoose.model('user', UserSchema);        // 여기의 'user'가 Blog.js 의 Schema 설정 내에 참조로 들어감
 module.exports = {User};
