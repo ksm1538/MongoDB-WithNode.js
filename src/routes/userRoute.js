@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Router } = require('express');
 const userRouter = Router();
-const {User} = require('../models/User');                // schema 설정 내용 불러오기
+const {User} = require('../models');                // schema 설정 내용 불러오기
 
 /*** user API 정의(시작)  ***/
 

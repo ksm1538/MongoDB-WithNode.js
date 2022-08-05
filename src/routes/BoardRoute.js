@@ -1,9 +1,14 @@
 const {Router, response} = require('express');
 const boardRouter = Router();
 
-const {Board} = require('../models/Board');
-const {User} = require('../models/User');
+const {Board, User} = require('../models');
 const {isValidObjectId} = require('mongoose');
+
+const {commentRouter} = require('./CommentRoute');    // commentRouter 불러오기
+
+
+// URL이 /board/:boardId/comment로 들어온 경우 commentRouter로 연결
+boardRouter.use('/:boardId/comment', commentRouter);
 
 // Board 데이터 추가
 boardRouter.post('/', async(request, response) => {

@@ -2,8 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 
-const {userRouter} = require('./routes/userRoute');         // userRouter 불러오기
-const {boardRouter} = require('./routes/boardRoute');        // boardRouter 불러오기
+const {userRouter, boardRouter} = require('./routes');          // userRouter 불러오기
 
 const MONGO_URI = 'mongodb+srv://seongmok:3751538@mongodbstudycluster.f1v7mjy.mongodb.net/Blog';
 
@@ -32,7 +31,6 @@ const server = async() => {
 
         // URL이 /board로 들어온 경우 boardRouter로 연결
         app.use('/board', boardRouter);
-
     }catch(err){
         console.log(err);
     }
