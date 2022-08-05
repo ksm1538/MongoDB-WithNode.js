@@ -3,6 +3,12 @@ const commentRouter = Router({mergeParams:true});       // mergeParams:true -> ì
 const {Comment, Board, User} = require('../models');
 const {isValidObjectId} = require('mongoose');
 
+commentRouter.get('/:commentId', async(request, response) => {
+    const {boardId, commentId} = request.params;
+
+    return response.send({boardId, commentId});
+});
+
 commentRouter.post('/', async(request, response) => {
     try{
         const { boardId } = request.params;
