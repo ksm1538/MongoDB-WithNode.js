@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+const {generateFakeData} = require("../faker");
 
 const {userRouter, boardRouter} = require('./routes');          // userRouter 불러오기
 
-const MONGO_URI = 'mongodb+srv://seongmok:3751538@mongodbstudycluster.f1v7mjy.mongodb.net/Blog';
+const MONGO_URI = 'mongodb+srv://seongmok:3751538@mongodbstudycluster.f1v7mjy.mongodb.net/Board';
 
 const server = async() => {
     try{
@@ -13,6 +14,8 @@ const server = async() => {
 
         console.log("==== MongoDB Connected ====");
         
+        await generateFakeData(100, 10, 200);      // 임시 데이터 생성
+
         // request의 데이터를 json 형태로 변환해주는 기능을 사용하겠다 라는 의미
         app.use(express.json());        
 
