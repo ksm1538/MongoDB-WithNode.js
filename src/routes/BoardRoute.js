@@ -41,7 +41,7 @@ boardRouter.post('/', async(request, response) => {
 // Board 데이터 전체 조회
 boardRouter.get('/', async(request, response) => {
     try{
-        let board = await Board.find({});
+        let board = await Board.find({}).limit(10);
 
         return response.send({board});
     } catch(err){

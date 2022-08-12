@@ -14,7 +14,8 @@ const server = async() => {
 
         console.log("==== MongoDB Connected ====");
         
-        await generateFakeData(100, 10, 200);      // 임시 데이터 생성
+        // 생성완료하였으니 주석 처리
+        // await generateFakeData(100, 10, 200);      // 임시 데이터 생성
 
         // request의 데이터를 json 형태로 변환해주는 기능을 사용하겠다 라는 의미
         app.use(express.json());        

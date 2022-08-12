@@ -59,8 +59,8 @@ commentRouter.get('/', async(request, response) => {
         if(!isValidObjectId(boardId))
             return response.status(400).send({error : "정확한 boardId 입력해주세요."});
 
-        const comment = await Comment.find({board:boardId});
-        return response.send({comment});
+        const comments = await Comment.find({board:boardId});
+        return response.send({comments});
         
     } catch(err){
         console.log(err);
