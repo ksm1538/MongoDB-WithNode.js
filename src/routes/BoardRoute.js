@@ -41,7 +41,9 @@ boardRouter.post('/', async(request, response) => {
 // Board 데이터 전체 조회
 boardRouter.get('/', async(request, response) => {
     try{
-        let board = await Board.find({}).limit(10);
+        let board = await Board.find({})
+            .limit(20)
+            .populate([{path: "user"}, {path : "comments" }]);  // populate : 안에 있는 userId를 이용해서 알아서 mongoose에서 가져옴
 
         return response.send({board});
     } catch(err){
