@@ -41,8 +41,12 @@ commentRouter.post('/', async(request, response) => {
             return response.status(400).send({error : "해당 게시판이 삭제되었습니다."});    
         }
 
-        const comment = new Comment({content, user, board});
-        await comment.save();
+        const comment = new Comment({content, user, name:`${user.name}`, board});
+        await Promise.all([
+            comment.save(),
+            Board.updateOne({_id : boardId}, {$push : {comments : comment}})
+        ]);
+
         return response.send(comment);
 
     } catch(err){

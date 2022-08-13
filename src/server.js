@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const {generateFakeData} = require("../faker");
+const {generateFakeData2} = require("../faker2");
 
 const {userRouter, boardRouter} = require('./routes');          // userRouter 불러오기
 
@@ -17,6 +18,7 @@ const server = async() => {
         // 생성완료하였으니 주석 처리
         // await generateFakeData(100, 10, 200);      // 임시 데이터 생성
 
+        //await generateFakeData2(100, 10, 200);      // 임시 데이터 생성 2
         // request의 데이터를 json 형태로 변환해주는 기능을 사용하겠다 라는 의미
         app.use(express.json());        
 

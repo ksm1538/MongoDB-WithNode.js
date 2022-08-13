@@ -16,19 +16,19 @@ boardRouter.post('/', async(request, response) => {
         const { title, content, isUse, userId } = request.body;
 
         if(typeof title != "string" ) 
-            response.status(400).send({error:"title을 입력하세요."});
+            return response.status(400).send({error:"title을 입력하세요."});
         if(typeof content != "string" ) 
-            response.status(400).send({error:"content을 입력하세요."});
+            return response.status(400).send({error:"content을 입력하세요."});
         if(isUse && typeof isUse != "boolean" ) 
-            response.status(400).send({error:"isUse 입력하세요."});
+            return response.status(400).send({error:"isUse 입력하세요."});
         if(!isValidObjectId(userId))
-            response.status(400).send({error: "userId를 제대로 입력해주세요."});
+            return response.status(400).send({error: "userId를 제대로 입력해주세요."});
 
         let user = await User.findById(userId);
         if(user == null)
             response.status(400).send({error: "해당 유저가 존재하지 않습니다."});
 
-        let board = new Board({... request.body, user:userId});
+        let board = new Board({... request.body, user});
         await board.save();
 
         return response.send({board});
