@@ -72,4 +72,23 @@ commentRouter.get('/', async(request, response) => {
     }
 })
 
+commentRouter.patch("/:commentId", async(request, response) => {
+    const {commentId} = request.params;
+    const {content} = request.body;
+
+    if(typeof content != "string"){
+        return response.status(400).send({err:"변경할 내용을 입력해주세요."});
+    }
+
+    const [comment] = await Promise.all([
+        Comment.findOneAndUpdate({_id:commentId}, {content}, {new : true}),
+        Board.updateOne(
+            {"comments._id" : commentId},
+            {"comments.$.content" : content}
+        )
+    ]);
+
+    return response.send({comment});
+});
+
 module.exports = {commentRouter};

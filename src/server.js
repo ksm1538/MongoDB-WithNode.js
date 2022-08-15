@@ -11,20 +11,21 @@ const MONGO_URI = 'mongodb+srv://seongmok:3751538@mongodbstudycluster.f1v7mjy.mo
 const server = async() => {
     try{
         await mongoose.connect(MONGO_URI);
-        mongoose.set("debug", true);
+        mongoose.set("debug", true);        // 쿼리를 콘솔에 보이고 싶을 때
 
         console.log("==== MongoDB Connected ====");
         
         // 생성완료하였으니 주석 처리
         // await generateFakeData(100, 10, 200);      // 임시 데이터 생성
 
-        //await generateFakeData2(100, 10, 200);      // 임시 데이터 생성 2
+        
         // request의 데이터를 json 형태로 변환해주는 기능을 사용하겠다 라는 의미
         app.use(express.json());        
 
         // 포트 설정
-        app.listen(3000, function(){
+        app.listen(3000, async () => {
             console.log("server opened port : 3000");
+            //  await generateFakeData2(10, 3, 10);  // 임시 데이터 생성 2
         });
 
         // GET METHOD로 된 링크 설정

@@ -3,6 +3,10 @@ const { User } = require("./src/models");
 const axios = require("axios");
 const URI = "http://localhost:3000";
 
+/**
+  faker1.js 와는 다르게 mongoDB에 직접 붙는 것이 아니라,
+  axios로 호출을 하여 데이터를 추가하는 방식이므로 너무 많은 데이터를 넣으려고 하면 오류 발생함
+ */
 generateFakeData2 = async (userCount, boardsPerUser, commentsPerUser) => {
   try{
     if (typeof userCount !== "number" || userCount < 1)
@@ -60,7 +64,7 @@ generateFakeData2 = async (userCount, boardsPerUser, commentsPerUser) => {
       for (let i = 0; i < commentsPerUser; i++) {
         let index = Math.floor(Math.random() * newBoards.length);
         comments.push(
-          axios.post(`${URI}/blog/${newBoards[index].data.boards._id}/comment`, {
+          axios.post(`${URI}/board/${newBoards[index].data.board._id}/comment`, {
             content: faker.lorem.sentence(),
             userId: user.id,
           })

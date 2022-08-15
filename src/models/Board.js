@@ -16,7 +16,7 @@ const BoardSchema = new Schema({
     // comment도 user와 마찬가지로 같이 정보를 넣어주되, 정의를 CommentSchema로 불러올 수도 있음.
     // comment 데이터가 생성된 후 Blog 데이터를 업데이트 하는 방식
     comments : [CommentSchema],
-}, 
+},                  
 {timestamps: true});
 
 

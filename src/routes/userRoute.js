@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Router } = require('express');
 const userRouter = Router();
-const {User} = require('../models');                // schema 설정 내용 불러오기
+const {User, Board} = require('../models');                // schema 설정 내용 불러오기
 
 /*** user API 정의(시작)  ***/
 
@@ -113,6 +113,7 @@ userRouter.put("/:userId", async (request, response) => {
         }
         if(name){
             user.name = name;
+            await Board.updateMany({"user._id" : userId}, {"user.name" : name});
         }
         await user.save();
         return response.send({user})
