@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Router } = require('express');
 const userRouter = Router();
-const {User, Board} = require('../models');                // schema 설정 내용 불러오기
+const {User, Board, Comment} = require('../models');                // schema 설정 내용 불러오기
 
 /*** user API 정의(시작)  ***/
 
@@ -67,9 +67,19 @@ userRouter.delete("/:userId", async (request, response) => {
             return response.status(400).send({ error : "정확한 userId를 입력해주세요." }); 
         }
 
-        // deleteOne : 해당 조건의 데이터를 삭제
-        // findOneAndDelete : 해당 조건의 데이터를 찾으면 삭제(해당 데이터는 반환됨), 데이터를 못찾으면 null 반환
-        const user = await User.findOneAndDelete({_id:userId});
+
+        const [user] = await Promise.all([
+            // deleteOne : 해당 조건의 데이터를 삭제
+            // findOneAndDelete : 해당 조건의 데이터를 찾으면 삭제(해당 데이터는 반환됨), 데이터를 못찾으면 null 반환
+
+            User.findOneAndDelete({_id:userId}),            // users 컬렉션에서 해당 유저 삭제
+            Board.deleteMany({"user._id" : userId}),        // 해당 유저가 생성한 boards 컬렉션 삭제
+            Board.updateMany(                               // 해당 유저가 생성한 boards 안의 comments 삭제
+                {"comments._user":userId},
+                {$pull : {comments : {user : userId}}}
+            ),
+            Comment.deleteMany({user:userId})               // comments 컬렉션에서 해당 유저가 생성한 comments 삭제
+        ]);
 
         return response.send({user})
     } catch(err){
@@ -113,7 +123,18 @@ userRouter.put("/:userId", async (request, response) => {
         }
         if(name){
             user.name = name;
-            await Board.updateMany({"user._id" : userId}, {"user.name" : name});
+
+            await Promise.all([
+                // Board 안에 있는 User 정보 수정
+                Board.updateMany({"user._id" : userId}, {"user.name" : name}),
+                
+                // Board 안에 있는 Comment 의 User 정보 수정
+                Board.updateMany(
+                    {},                                             // 조건 설정을 안하고
+                    {"comments.$[condition].name" : `${name}`},     // comment 배열의 name을 수정한다.
+                    {arrayFilters : [{"condition.user" : userId}]}  // 배열의 인덱스인 condition의 user 는 userId이다.
+                )
+            ]);
         }
         await user.save();
         return response.send({user})

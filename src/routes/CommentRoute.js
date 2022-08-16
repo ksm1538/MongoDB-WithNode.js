@@ -91,4 +91,16 @@ commentRouter.patch("/:commentId", async(request, response) => {
     return response.send({comment});
 });
 
+commentRouter.delete("/:commentId", async(request, response) => {
+    const {commentId} = request.params;
+    const comment = await Comment.findOneAndDelete({_id : commentId});
+
+    await Board.updateOne(
+        {"comments._id" : commentId},               // boards안의 comments 배열 중 _id가 commentId와 같은 데이터를
+        {$pull : {comments: {_id : commentId}}}     // $pull : 삭제하겠다.
+    );
+
+    return response.send({comment});
+});
+
 module.exports = {commentRouter};
