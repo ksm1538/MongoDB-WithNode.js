@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const {generateFakeData} = require("../faker");
 const {generateFakeData2} = require("../faker2");
+const {generateFakeData3} = require("../faker3");
 
 const {userRouter, boardRouter} = require('./routes');          // userRouter 불러오기
 
@@ -11,7 +12,7 @@ const MONGO_URI = 'mongodb+srv://seongmok:3751538@mongodbstudycluster.f1v7mjy.mo
 const server = async() => {
     try{
         await mongoose.connect(MONGO_URI);
-        mongoose.set("debug", true);        // 쿼리를 콘솔에 보이고 싶을 때
+        //mongoose.set("debug", true);        // 쿼리를 콘솔에 보이고 싶을 때
 
         console.log("==== MongoDB Connected ====");
         
@@ -26,6 +27,7 @@ const server = async() => {
         app.listen(3000, async () => {
             console.log("server opened port : 3000");
             //  await generateFakeData2(10, 3, 10);  // 임시 데이터 생성 2
+            //await generateFakeData3(1000000);  // 임시 데이터 생성 3
         });
 
         // GET METHOD로 된 링크 설정
