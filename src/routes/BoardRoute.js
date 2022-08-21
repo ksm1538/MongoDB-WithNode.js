@@ -38,12 +38,19 @@ boardRouter.post('/', async(request, response) => {
     }
 });
 
-// Board 데이터 전체 조회
+// Board 데이터 조회
 boardRouter.get('/', async(request, response) => {
     try{
+        let { page } = request.query;
+        page = parseInt(page);
+
+        let limit = 3;
+        let skip = limit * page;
+
         let board = await Board.find({})
-            .limit(20)
-            .populate([{path: "user"}, {path : "comments" }]);  // populate : 안에 있는 userId를 이용해서 알아서 mongoose에서 가져옴
+            .sort({createdAt:-1})       // -1: 내림차순, 1: 오름차순
+            .skip(skip)                 // skip의 갯수만큼 데이터를 제외하고 조회
+            .limit(limit);              // 데이터 3개만 조회
 
         return response.send({board});
     } catch(err){

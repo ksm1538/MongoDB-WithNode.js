@@ -26,7 +26,7 @@ const server = async() => {
         // 포트 설정
         app.listen(3000, async () => {
             console.log("server opened port : 3000");
-            //  await generateFakeData2(10, 3, 10);  // 임시 데이터 생성 2
+            //await generateFakeData2(10, 3, 10);  // 임시 데이터 생성 2
             //await generateFakeData3(1000000);  // 임시 데이터 생성 3
         });
 
