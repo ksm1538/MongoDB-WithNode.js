@@ -41,11 +41,32 @@ commentRouter.post('/', async(request, response) => {
             return response.status(400).send({error : "해당 게시판이 삭제되었습니다."});    
         }
 
-        const comment = new Comment({content, user, name:`${user.name}`, board});
+        const comment = new Comment({
+            content, 
+            user, 
+            name:`${user.name}`, 
+            board:boardId
+        });
+
+        board.commentsCount++;
+        board.comments.push(comment);
+        
+        // 게시판의 내장 댓글은 3개만 하며 최신순으로 함. 3개가 넘었을 때 신규 댓글이 작성되면 오래된 댓글은 삭제됨(comments에서 확인해야함)
+        if(board.commentsCount>3){
+            board.comments.shift();
+        }
+        /*
         await Promise.all([
             comment.save(),
             Board.updateOne({_id : boardId}, {$push : {comments : comment}})
         ]);
+        */
+
+        await Promise.all([
+            comment.save(),
+            board.save()
+        ])
+        await comment.save();
 
         return response.send(comment);
 
@@ -58,12 +79,20 @@ commentRouter.post('/', async(request, response) => {
 
 commentRouter.get('/', async(request, response) => {
     try{
-        const {boardId} = request.params;
+        let { page=0 } = request.query; // 주소창에 넣은 파라미터는 query를 이용해서 가져와야함. page=0 : 0을 기본값으로 한다는 뜻
+        let { boardId } = request.params;
+        console.log({page});
+        let limit = 3;
+        let skip = page * limit;
       
         if(!isValidObjectId(boardId))
             return response.status(400).send({error : "정확한 boardId 입력해주세요."});
 
-        const comments = await Comment.find({board:boardId});
+        const comments = await Comment.find({board:boardId})
+                                    .sort({createdAt:-1})
+                                    .skip(skip)
+                                    .limit(limit);
+
         return response.send({comments});
         
     } catch(err){

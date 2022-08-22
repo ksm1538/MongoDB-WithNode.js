@@ -94,6 +94,7 @@ boardRouter.put('/:boardId', async(request, response) => {
             response.status(400).send({error: "boardId를 제대로 입력해주세요."});
 
         const board = await Board.findOneAndUpdate({_id:boardId}, {title, content}, {new : true});
+        //  const commentCount = await Comment.find({board:boardId}).countDocuments(); // 해당 게시판의 댓글 수
 
         return response.send({board});
     } catch(err){

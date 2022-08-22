@@ -13,12 +13,14 @@ const BoardSchema = new Schema({
       name: {type: String, required: true},
     },
 
+    commentsCount : {type:Number, default:0, required:true},          // 댓글 수
     // comment도 user와 마찬가지로 같이 정보를 넣어주되, 정의를 CommentSchema로 불러올 수도 있음.
     // comment 데이터가 생성된 후 Blog 데이터를 업데이트 하는 방식
-    comments : [CommentSchema],
+    comments : [CommentSchema], 
 },                  
 {timestamps: true});
 
+BoardSchema.index({"user._id": 1, updatedAt: 1});      // user의 id와 updatedAt으로 인덱스(복합키) 생성
 
 /*
 // 위에서 필드를 넣어줬으니 virtual 부분은 주석처리함
