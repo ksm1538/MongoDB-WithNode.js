@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const commentRouter = Router({mergeParams:true});       // mergeParams:true -> 앞에서 받은 파라미터도 같이 사용할 수 있는 지에 대한 여부
 const {Comment, Board, User} = require('../models');
-const {isValidObjectId} = require('mongoose');
+const {isValidObjectId, startSession} = require('mongoose');
 
 commentRouter.get('/:commentId', async(request, response) => {
     const {boardId, commentId} = request.params;
@@ -10,69 +10,81 @@ commentRouter.get('/:commentId', async(request, response) => {
 });
 
 commentRouter.post('/', async(request, response) => {
+    const session = await startSession();
+
+    let comment;
+
     try{
-        const { boardId } = request.params;
-        const { content, userId } = request.body;
+        await session.withTransaction(async()=>{
+            const { boardId } = request.params;
+            const { content, userId } = request.body;
+            
+            if(!isValidObjectId(boardId))
+                return response.status(400).send({error : "정확한 boardId 입력해주세요."});
+
+            if(!isValidObjectId(userId))
+                return response.status(400).send({error : "정확한 userId를 입력해주세요."});    
+
+            if(typeof content != "string")    
+                return response.status(400).send({error : "content를 입력해주세요."});    
+
+            /*
+            const board = await Board.findById(boardId);
+            const user = await User.findById(userId);
+            */
+
+            // 위에 주석처리한 부분과 같은 호출이지만 Promise.all을 이용해 내부에 있는 로직을 한번에 호출할 수 있다.
+            const [board, user] = await Promise.all([
+                Board.findById(boardId, {}, {session}),
+                User.findById(userId, {}, {session})
+            ]);
+
+            if(board == null || user == null){
+                return response.status(400).send({error : "게시판 또는 사용자가 존재하지 않습니다."});    
+            }
+            if(!board.isUse){
+                return response.status(400).send({error : "해당 게시판이 삭제되었습니다."});    
+            }
+
+            comment = new Comment({
+                content, 
+                user, 
+                name:`${user.name}`, 
+                board:boardId
+            });
+
+            board.commentsCount++;
+            board.comments.push(comment);
+            
+            // 게시판의 내장 댓글은 3개만 하며 최신순으로 함. 3개가 넘었을 때 신규 댓글이 작성되면 오래된 댓글은 삭제됨(comments에서 확인해야함)
+            // 참고) shift를 사용하지않고 MongoDB의 $slice를 이용할 수도 있음.
+            if(board.commentsCount>3){
+                board.comments.shift();
+            }
+
+            /*
+            await Promise.all([
+                comment.save(),
+                Board.updateOne({_id : boardId}, {$push : {comments : comment}})
+            ]);
+            */
+
+            await Promise.all([
+                comment.save({session}),
+                board.save()        // board의 경우 위에서 session을 통해 불러왔기 때문에 session을 기입해줄 필요가 없다.
+            ])
+        })
         
-        if(!isValidObjectId(boardId))
-            return response.status(400).send({error : "정확한 boardId 입력해주세요."});
 
-        if(!isValidObjectId(userId))
-            return response.status(400).send({error : "정확한 userId를 입력해주세요."});    
-
-        if(typeof content != "string")    
-            return response.status(400).send({error : "content를 입력해주세요."});    
-
-        /*
-        const board = await Board.findById(boardId);
-        const user = await User.findById(userId);
-        */
-
-        // 위에 주석처리한 부분과 같은 호출이지만 Promise.all을 이용해 내부에 있는 로직을 한번에 호출할 수 있다.
-        const [board, user] = await Promise.all([
-            Board.findById(boardId),
-            User.findById(userId)
-        ]);
-
-        if(board == null || user == null){
-            return response.status(400).send({error : "게시판 또는 사용자가 존재하지 않습니다."});    
-        }
-        if(!board.isUse){
-            return response.status(400).send({error : "해당 게시판이 삭제되었습니다."});    
-        }
-
-        const comment = new Comment({
-            content, 
-            user, 
-            name:`${user.name}`, 
-            board:boardId
-        });
-
-        board.commentsCount++;
-        board.comments.push(comment);
-        
-        // 게시판의 내장 댓글은 3개만 하며 최신순으로 함. 3개가 넘었을 때 신규 댓글이 작성되면 오래된 댓글은 삭제됨(comments에서 확인해야함)
-        if(board.commentsCount>3){
-            board.comments.shift();
-        }
-        /*
-        await Promise.all([
-            comment.save(),
-            Board.updateOne({_id : boardId}, {$push : {comments : comment}})
-        ]);
-        */
-
-        await Promise.all([
-            comment.save(),
-            board.save()
-        ])
-        await comment.save();
-
-        return response.send(comment);
-
+        return response.send({comment});
     } catch(err){
         console.log(err);
+        await session.abortTransaction();   // 트랜잭션 중지(원복)
         return response.status(500).send({ error : err.message });
+    }
+    finally{
+        await session.endSession();     // 트랜잭션 종료
+
     }
     
 })
